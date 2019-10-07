@@ -4,7 +4,8 @@ class Player {
   constructor(username) {
     this.username = username;
     this.pile = [];
-    this.id = this.generateId();  }
+    this.id = this.generateId();  
+  }
 
   generateId() {
     return crypto.randomBytes(10).toString('hex');
