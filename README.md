@@ -45,7 +45,7 @@ This will require one terminal window for the server, and then a terminal window
 
 Here's what that looks like.
 
-![](https://gfycat.com/ifr/HollowHastyLadybug)
+<iframe src='https://gfycat.com/ifr/HollowHastyLadybug' frameborder='0' scrolling='no' allowfullscreen width='640' height='689'></iframe>
 
 
 #### Game Commands 🕹
@@ -64,7 +64,7 @@ Anything else entered in the prompt is ignored.
 
 Here's another demo in which we actually slap:
 
-![](https://gfycat.com/ifr/FamiliarElegantBarebirdbat)
+<iframe src='https://gfycat.com/ifr/FamiliarElegantBarebirdbat' frameborder='0' scrolling='no' allowfullscreen width='640' height='687'></iframe>
 
 ### Running the testing framework
 
