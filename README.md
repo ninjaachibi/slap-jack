@@ -43,6 +43,10 @@ This will require one terminal window for the server, and then a terminal window
 1. In one terminal window, run `npm run server`.
 2. In another window(s), run `npm run client <username>`. You should do this for each player you want to play in the game. Further, usernames must be unique. Since we're using sockets here, the room can accommodate a comfy **four** players. 
 
+Here's what that looks like.
+
+![](https://gfycat.com/ifr/HollowHastyLadybug)
+
 
 #### Game Commands 🕹
 
@@ -57,6 +61,10 @@ The commands are:
 |  's'  |  signals a `slap` event. A player can slap at any time, and the effects of a given slap are documented above in the game rules above. |  
 
 Anything else entered in the prompt is ignored.
+
+Here's another demo in which we actually slap:
+
+![](https://gfycat.com/ifr/FamiliarElegantBarebirdbat)
 
 ### Running the testing framework
 
@@ -74,7 +82,7 @@ I used Modern Javascript ES6 functionality to build.
 That meant that I thought of abstracting the majority of the game of slapjack into the `Game` class using [ES6 classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes). In my design process, it made sense to abstract `Card` since it had `value` and `suit` information. Since I wanted a multiplayer game, it was reasonable to abstract `Player` into its own class.
 
 ### Game Logic and Backend Design ♠️
-I used the socket.io library as a the primary backbone of my backend server. Sockets are pretty similar to event emitters, so my backend is quite event emitter-based consisting of a network of event-listeners and event-emitters.
+I used the [socket.io](socket.io) library as a the primary backbone of my backend server. Sockets are pretty similar to event emitters, so my backend is quite event emitter-based consisting of a network of event-listeners and event-emitters.
 
 ### Displaying the Game ♥️
 
