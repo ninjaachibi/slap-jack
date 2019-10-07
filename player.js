@@ -12,10 +12,6 @@ class Player {
   }
 
   // PERSISTENCE FUNCTIONS
-  //
-  // Start here after completing Step 2!
-  // We have written a persist() function for you to save your game state to
-  // a store.json file.
   // =====================
   fromObject(object) {
     this.username = object.username;

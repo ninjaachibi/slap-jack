@@ -42,7 +42,6 @@ class Game {
         tempDeck.push(new Card(suit, value));
       }
     }
-    //console.log('deck is ', tempDeck);
     var shuffledDeck = _.shuffle(tempDeck);
 
     for (var i = 0; i < shuffledDeck.length; i++) {
@@ -50,9 +49,6 @@ class Game {
       this.players[currentPlayerId].pile.push(shuffledDeck[i]);
     }
 
-    // for(var player in this.players) {
-    //   console.log(this.players[player]);
-    // }
   }
 
   nextPlayer() {
@@ -79,7 +75,7 @@ class Game {
   playCard(playerId) {
     if (!this.isStarted) throw "Error, not started yet";
     if (this.playerOrder[0] !== playerId) throw "Don't play out of turn!";
-    if (this.players[playerId].pile.length === 0) throw "you have no cards left you fool";
+    if (this.players[playerId].pile.length === 0) throw "you have no cards left";
 
     //move top card of player's pile to top of deck
     var currentCard = this.players[playerId].pile.pop();
@@ -108,6 +104,7 @@ class Game {
 
   slap(playerId) {
     if (!this.isStarted) throw "Error, not started yet";
+    if (this.pile.length < 2 ) throw "Cannot slap a pile of size 1 or 0"
 
     if (this.pile[this.pile.length - 1].value === 11 ||
       this.pile.length > 2 &&
@@ -135,10 +132,6 @@ class Game {
   }
 
   // PERSISTENCE FUNCTIONS
-  //
-  // Start here after completing Step 2!
-  // We have written a persist() function for you to save your game state to
-  // a store.json file.
   // =====================
   fromObject(object) {
     this.isStarted = object.isStarted;
