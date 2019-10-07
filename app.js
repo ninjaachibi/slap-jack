@@ -1,32 +1,8 @@
 "use strict";
 
-var path = require('path');
-var morgan = require('morgan');
-var path = require('path');
-var express = require('express');
-var exphbs  = require('express-handlebars');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+var server = require('http').createServer();
+var io = require('socket.io')(server);
 var _ = require('underscore');
-
-app.engine('hbs', exphbs({
-  extname: 'hbs',
-  defaultLayout: 'main'
-}));
-app.set('view engine', 'hbs');
-
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(bodyParser.json());
-app.use(cookieParser());
-app.use(morgan('tiny'));
-
-app.get('/', function(req, res) {
-  res.render('index');
-});
 
 // Here is your new Game!
 var Card = require('./card');
@@ -41,11 +17,40 @@ function getGameState() {
   var players = "";
   var numCards = {};
 
+  var isStarted = game.isStarted;
+  var cardsInDeck = game.pile.length;
+  var currentPlayerUsername = game.players[game.playerOrder[0]].username;
+  var playersInGame = Object.values(game.players).map(player => player.username)
+  // console.log(game.players, playersInGame)
+
+  // see if we have a winner
+  var win = undefined;
+  // console.log(game.players)
+  for(let playerId in game.players) {
+    if(game.isWinning(playerId)) {
+      win = game.players[playerId].username;
+      break;
+    }
+  }
+  
+  //populate numcards
+  for(let playerId in game.players) {
+    numCards[playerId] = game.players[playerId].pile.length;
+  }
+
+  console.log(numCards)
+
   // YOUR CODE HERE
+
 
   // return an object with 6 different properties
   return {
-
+    isStarted,
+    numCards,
+    currentPlayerUsername,
+    playersInGame,
+    cardsInDeck,
+    win
   }
 }
 
@@ -70,7 +75,16 @@ io.on('connection', function(socket) {
       socket.emit('errorMessage', `${winner} has won the game. Restart the server to start a new game.`);
       return;
     }
-    // YOUR CODE HERE
+    try {
+      console.log('user is', data);
+
+      socket.playerId = game.addPlayer(data);
+      io.emit('username', { id: socket.playerId, username: data });
+      io.emit('updateGame', getGameState());
+    }
+    catch (error) {
+      socket.emit('errorMessage', error)
+    }
   });
 
   socket.on('start', function() {
@@ -78,7 +92,25 @@ io.on('connection', function(socket) {
       socket.emit('errorMessage', `${winner} has won the game. Restart the server to start a new game.`);
       return;
     }
-    // YOUR CODE HERE
+
+    if (!socket.playerId) {
+      socket.emit('errorMessage', 'You are not a player of the game!')
+      console.log('error', error);
+    }
+    else {
+      try {
+        game.startGame();
+        io.emit('start');
+        io.emit('updateGame', getGameState());
+        console.log('game has started', getGameState());
+        
+      }
+      catch (error) {
+        socket.emit('errorMessage', error)
+        console.log('error', error);
+        
+      }
+    }
   });
 
   socket.on('playCard', function() {
@@ -86,8 +118,21 @@ io.on('connection', function(socket) {
       socket.emit('errorMessage', `${winner} has won the game. Restart the server to start a new game.`);
       return;
     }
-    // YOUR CODE HERE
 
+    // console.log('playerid',socket.playerId);
+    if (!socket.playerId) {
+      socket.emit('errorMessage', 'You are not a player of the game!')
+    }
+    else {
+      try {
+        var ret = game.playCard(socket.playerId);
+        console.log('ret is', ret);
+        io.emit('playCard', ret);
+      }
+      catch (error) {
+        socket.emit('errorMessage', error)
+      }
+    }
 
     // YOUR CODE ENDS HERE
     // broadcast to everyone the game state
@@ -99,12 +144,12 @@ io.on('connection', function(socket) {
       socket.emit('errorMessage', `${winner} has won the game. Restart the server to start a new game.`);
       return;
     }
-    // YOUR CODE HERE
+    // TODO
   });
 
 });
 
 var port = process.env.PORT || 3000;
-http.listen(port, function(){
+server.listen(port, function(){
   console.log('Express started. Listening on %s', port);
 });
