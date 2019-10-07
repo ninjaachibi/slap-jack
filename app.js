@@ -19,11 +19,9 @@ function getGameState() {
   var cardsInDeck = game.pile.length;
   var currentPlayerUsername = game.players[game.playerOrder[0]].username;
   var playersInGame = Object.values(game.players).map(player => player.username)
-  // console.log(game.players, playersInGame)
 
   // see if we have a winner
   var win = undefined;
-  // console.log(game.players)
   for (let playerId in game.players) {
     if (game.isWinning(playerId)) {
       console.log('winning!', playerId);
@@ -193,7 +191,7 @@ io.on('connection', function (socket) {
 
 });
 
-var port = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
 server.listen(port, function () {
   console.log('Express started. Listening on %s', port);
 });
