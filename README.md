@@ -76,9 +76,89 @@ npm test
 
 ## Design Rationale 🎨
 
-I used Modern Javascript ES6 functionality to build. 
+I used Modern Javascript ES6 functionality to build this game. 
 
 That meant that I thought of abstracting the majority of the game of slapjack into the `Game` class using [ES6 classes](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Classes). In my design process, it made sense to abstract `Card` since it had `value` and `suit` information. Since I wanted a multiplayer game, it was reasonable to abstract `Player` into its own class.
+
+### Cards 🂥 - `card.js`
+
+For any given `Card` object, we have:
+
+* The `value` of the playing card, from 1-13 (where Ace is 1, Jack is 11, Queen is 12, King is 13).
+* The `suit` of the playing card, which any one of the following: _hearts_, _spades_, _clubs_, or _diamonds_.
+* A `toString` function that allows us to get the human-readable description for the card, i.e. _Ace of Spades_, _8 of Hearts_, etc.
+
+### Player 🐥 - `player.js`
+
+For any given, `Player` object, we should have:
+
+* `username`.
+* `id` - generated upon construction.
+* `pile` - represented by an Array of `Card` objects.
+* A `generateId` function that helps to generate random strings. This uses the `crypto` library to generate a random hexadecimal id.
+
+### Game 🏅 - `game.js`
+This is the meat of the app! 🍖
+
+Below is a brief explanation of each property for the `Game` object and how they are used:
+
+* `isStarted` - A Boolean to check if the game is in progress or not. Initially, this will be `false`.
+* `players` - An Object to store the `Player` objects by the key of an ID and value of a `Player` object. We should be able to access `Player`s from this object with `players[id]`.
+* `playerOrder` - An Array of IDs of players, representing their order in the game. The current player will always be at index 0.
+
+	```
+	Initially, this.playerOrder is [0, 1, 2, 3]
+	// After player 0 has played, the array becomes
+	// [1, 2, 3, 0]
+	// After player 1 has played, the array becomes
+	// [2, 3, 0, 1]
+	// After player 2 has played, the array becomes
+	// [3, 0, 1, 2]
+	// After player 3 has played, the array becomes
+	// [0, 1, 2, 3]
+	// and the cycle goes on...
+	```
+
+* `pile` - An Array of `Card` objects representing the central pile.
+
+There are also a couple game-related functions:
+
+* `addPlayer(username)` - for adding players into the game
+	* takes a `username` as a String
+	* returns the ID of the new `Player`
+
+* `startGame()` - begins game setup
+
+* `nextPlayer()` - moves the current player to the next player. i.e. rotate `this.playerOrder` array by one to the left until the player at index 0 has a non-zero pile of cards.
+
+* `isWinning(playerId)` - takes a Player ID and return a boolean to determine whether or not the Player corresponding to that ID has won
+
+* `playCard(playerId)` - takes a Player ID of the Player attempting to play a Card
+	* Throws an error if the current Player ID does not match the passed-in Player ID (this means a player is attempting to play a card out of turn)
+	* Throws an error if the Player corresponding to the passed-in Player ID has a pile length of zero
+	* If no error was thrown:
+		* **move** the *top* card of a Player's pile onto the *top* card of the Game pile.
+		* **count** the number of players with 0 cards
+			* If the number of players with 0 cards equals to the total number of players (i.e. everyone has no more cards), **set** `isStarted` to false and **throw** an error. (It's a tie!)
+		* **calls** `this.nextPlayer()` to move the current player		
+		* **returns** an object with two keys `card` and `cardString`.
+
+* `slap(playerId)` - takes a Player ID of the Player attempting to slap and return an Object (format described below)
+	* Check for any of the winning slap conditions
+		* If the top card of the pile is a **Jack**
+		* If the top two cards of the pile are of the same **value**
+		* If the top card and third-to-top card are of the same value (a sandwich 🥪)
+
+	* If there is a winning slap condition, **move** the pile into the **back of the pile** of the Player corresponding to the passed-in Player ID, and **set** `this.pile` to `[]`
+		* Returns an object with the following key-value pairs:
+			* `winning: this.isWinning(playerId)`
+			* `message: 'got the pile!'`
+	* Otherwise, takes the **top** 3 cards (at most) from the pile of the Player corresponding to the passed-in Player ID and add it to the **bottom** of the game pile
+		* If the player has less than 3 cards, take everything. (Hint: `Math.min(3, len)`)
+		* Returns an object with the following key-value pairs:
+			* `winning: false`
+			* `message: 'lost 3 cards!'`
+
 
 ### Game Logic and Backend Design ♠️
 I used the [socket.io](socket.io) library as a the primary backbone of my backend server. Sockets are pretty similar to event emitters, so my backend is quite event emitter-based consisting of a network of event-listeners and event-emitters.
@@ -88,7 +168,9 @@ I used the [socket.io](socket.io) library as a the primary backbone of my backen
 A major difficulty for me was creating a front-end client for this game within the terminal. While it may have been more initutive to build a web app for the front-end, I used `socket.io-client` to send events to our socket backend. To display the messages reeived by our clients, I used the `chalk` library, which had a great choice of text colors and styles to choose from. To prompt the terminal, I used the `repl` library, although I may switch to `commander` after some more research. 
 
 ### Testing ♣  ️
-I used the Jasmine testing framework to write my unit tests. I used jasmine since I'm familiar with it and it's a well documented JS testing framework, along with Jest. 
+I used the [Jasmine](https://jasmine.github.io/) testing framework to write my unit tests. I used jasmine since I'm familiar with it and it's a well documented JS testing framework, along with [Jest](https://jestjs.io/). 
+
+The tests I've written so far are in `./tests.js`
 
 ### External libraries used ♦
 - I used [`underscore.js`](https://underscorejs.org/) for their fantastic `shuffle()` method using a version of the [Fisher-Yates shuffle](https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle).
@@ -103,13 +185,15 @@ I used the Jasmine testing framework to write my unit tests. I used jasmine sinc
 
 This project is by no means perfect and is very much a work-in-progress. Below is a list of TODOs, as well as known bugs and issues. If any bugs or issues not listed below are found, filing a bug or issue report would be greatly appreciated!
 
-TODO:
+TODO 🗒:
+* implement the control structure for the case of the top of the deck being a Jack.
 * implement persistence - I've written out the skeleton code for it, but I need to implement it
 * write some end-to-end tests - although I've written unit tests for each of the `Card`, `Player`, and `Game` classes, there's still room for E2E and integration tests to check that everything is working together correctly
 * implement observer status - if a game has already started, and a new user joins when a game is already in session, they can watch, but not participate.
 * use better colors in chalk to be more consistent across message types
 * deploy the app to Heroku to play with friends
 * implement custom rooms for each game using socket rooms/namespaces
+* write better documentation for the errors that get can thrown.
 
 Known bugs and issues 🐛:
 * Upon join the room, every user gets the error message `Error, not started yet`. It doesn't hurt anyone, but it's annoying and verbose.
