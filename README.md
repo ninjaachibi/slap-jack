@@ -40,6 +40,8 @@ This will require one terminal window for the server, and then a terminal window
 
 > _Note_: since the server is `localhost` on this project, it only works locally. If you want, you could use a [`ngrok`](https://ngrok.com/) server to make this game playable across different networks.
 
+> This is actually quite an important improvement to make later. See [todo](#things-to-fixknown-bugs-)
+
 1. In one terminal window, run `npm run server`.
 2. In another window(s), run `npm run client <username>`. You should do this for each player you want to play in the game. Further, usernames must be unique. Since we're using sockets here, the room can accommodate a comfy **four** players. 
 
@@ -186,12 +188,13 @@ The tests I've written so far are in `./tests.js`
 This project is by no means perfect and is very much a work-in-progress. Below is a list of TODOs, as well as known bugs and issues. If any bugs or issues not listed below are found, filing a bug or issue report would be greatly appreciated!
 
 TODO 🗒:
+* deploy the app to Heroku/ngrok to play with friends 
+	> this is kind of important because at the moment, you can only play locally with yourself or couple friends, and it's hard to be competitive because only multiple terminal windows cannot be in focus simultaneously. Thus, this isn't yet truly reaction-based since you and your opponenets must share a computer.
 * implement the control structure for the case of the top of the deck being a Jack.
 * implement persistence - I've written out the skeleton code for it, but I need to implement it
 * write some end-to-end tests - although I've written unit tests for each of the `Card`, `Player`, and `Game` classes, there's still room for E2E and integration tests to check that everything is working together correctly
 * implement observer status - if a game has already started, and a new user joins when a game is already in session, they can watch, but not participate.
 * use better colors in chalk to be more consistent across message types
-* deploy the app to Heroku to play with friends
 * implement custom rooms for each game using socket rooms/namespaces
 * write better documentation for the errors that get can thrown.
 
