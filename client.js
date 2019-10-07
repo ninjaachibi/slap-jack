@@ -1,3 +1,8 @@
+if(!process.argv[2]) {
+    console.error('Usage: Need a username')
+    process.exit(1)
+}
+
 var socket = require('socket.io-client')('http://localhost:3000');
 
 const repl = require('repl')
