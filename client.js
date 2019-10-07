@@ -27,7 +27,7 @@ socket.on('message', (data) => {
 socket.on('username', (data) => {
     console.log(chalk.blue(`${data.username} joined the game`))
     user = data;
-    console.log('user is', user);
+    // console.log('user is', user);
 })
 socket.on('updateGame', (gameState) => {
 

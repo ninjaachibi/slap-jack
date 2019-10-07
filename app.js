@@ -37,7 +37,7 @@ function getGameState() {
     numCards[playerId] = game.players[playerId].pile.length;
   }
 
-  // return an object with 6 different properties
+  // return an object representing the updated game state
   return {
     isStarted,
     numCards,
@@ -134,7 +134,7 @@ io.on('connection', function (socket) {
 
   });
 
-  socket.on('slap', function() {
+  socket.on('slap', function () {
     if (winner) {
       socket.emit('errorMessage', `${winner} has won the game. Restart the server to start a new game.`);
       return;
