@@ -14,20 +14,22 @@ socket.on('connect', () => {
 
     socket.emit('username', process.argv[2])
 })
-// socket.on('message', (data) => {
-//     const { cmd, username } = data
-//     console.log(chalk.green(username + ': ' + cmd.split('\n')[0]));
-// })
+
+socket.on('message', (data) => {
+    console.log(chalk.magenta(data));
+})
+
 socket.on('username', (data) => {
     console.log(chalk.blue(`${data.username} joined the game`))
     user = data;
+    console.log('user is', user);
 })
 socket.on('updateGame', (gameState) => {
 
     // Displays the username and number of cards the player has
     if (user) {
-        // console.log(chalk.blue('Playing as ' + user.username));
-        console.log(chalk.green(gameState.numCards[user.id] || 0) + ' cards in hand');
+        console.log(chalk.blue('Playing as ' + user.username));
+        console.log(chalk.green((gameState.numCards[user.id] || 0) + ' cards in hand'));
     }
 
     // Displays the current player
@@ -38,7 +40,7 @@ socket.on('updateGame', (gameState) => {
     }
 
     // Displays the number of cards in the game pile
-    console.log(chalk.blue(gameState.cardsInDeck + ' cards in pile'));
+    console.log(chalk.white(gameState.cardsInDeck + ' cards in pile'));
 
     // If the game is in a winning state, hide everything and show winning message
     if (gameState.win) {
@@ -47,18 +49,17 @@ socket.on('updateGame', (gameState) => {
 
 })
 socket.on('playCard', function (data) {
-    // console.log('card played', data);
-    
+
     const cardString = data.cardString;
-    console.log(chalk.green(cardString + ' played'));
+    console.log(chalk.white.bgCyan(cardString + ' played'));
 });
 
 socket.on('start', function () {
     console.log(chalk.blue('game has started'))
 });
-socket.on('clearDeck', function () {
-    // YOUR CODE HERE
-});
+// socket.on('clearDeck', function () {
+//     // CODE HERE
+// });
 
 // A handler for error messages
 socket.on('errorMessage', function (data) {
@@ -71,10 +72,10 @@ repl.start({
     prompt: '',
     eval: (cmd) => {
         cmd = cmd.trim()
-        
-        if(cmd === 'start') {
+
+        if (cmd === 'start') { //start the game
             socket.emit('start');
-        } //start the game
+        }
 
         else if (cmd === 'p') {
             socket.emit('playCard');
@@ -88,6 +89,3 @@ repl.start({
     }
 })
 
-function stringsEqual(a,b) {
-    return new String(a).valueOf() == new String(b).valueOf()
-}
